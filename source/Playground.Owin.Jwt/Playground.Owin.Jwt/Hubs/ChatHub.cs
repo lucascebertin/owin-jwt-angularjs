@@ -7,15 +7,10 @@ namespace Playground.Owin.Jwt.Hubs
     {
         private readonly ITest _Test;
 
-        public ChatHub()
+        public ChatHub(ITest test)
         {
-
+            _Test = test;
         }
-
-        //public ChatHub(ITest test)
-        //{
-        //    _Test = test;
-        //}
 
         public void Send(string name, string message)
         {

@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNet.SignalR;
+﻿using DryIoc;
+using DryIoc.SignalR;
+using DryIoc.WebApi;
+using Microsoft.AspNet.SignalR;
 using Microsoft.Owin;
 using Microsoft.Owin.Cors;
 using Microsoft.Owin.Diagnostics;
@@ -38,6 +41,12 @@ namespace Playground.Owin.Jwt
                 EnableDefaultFiles = true,
                 FileSystem = new WebPhysicalFileSystem(".\\wwwroot")
             };
+
+            //******************
+            var container = new Container();
+            container.WithWebApi(webApiConfig);
+            container.WithSignalR(hubConfig);
+            //******************
 
             app.UseErrorPage(ErrorPageOptions.ShowAll)
                 .UseCors(CorsOptions.AllowAll)

@@ -9,15 +9,10 @@ namespace Playground.Owin.Jwt.Controllers
     {
         private readonly ITest _Test;
 
-        public HelloWorldController()
+        public HelloWorldController(ITest test)
         {
-
+            _Test = test;
         }
-
-        //public HelloWorldController(ITest test)
-        //{
-        //    _Test = test;
-        //}
 
         public IHttpActionResult Get(int? id = null)
         {
