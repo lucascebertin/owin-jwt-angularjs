@@ -1,4 +1,6 @@
-﻿using System.Web.Http;
+﻿using Microsoft.AspNet.SignalR;
+using Playground.Owin.Jwt.Hubs;
+using System.Web.Http;
 
 namespace Playground.Owin.Jwt.Controllers
 {
@@ -11,6 +13,8 @@ namespace Playground.Owin.Jwt.Controllers
 
         public IHttpActionResult Get(int? id = null)
         {
+            var hub = GlobalHost.ConnectionManager.GetHubContext<ChatHub>();
+            hub.Clients.All.addMessage("id", id.HasValue ? id.Value.ToString() : "null");
             return Ok();
         }
 

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -515,10 +515,15 @@
                 </div>
             </div>
         </div>
+
+        <div>
+            <button id="chat-button" value="click"></button>
+        </div>
     </div>
 
     <!-- jQuery -->
     <script src="js/jquery.js"></script>
+    <script src="js/jquery.signalr-2.2.0.min.js"></script>
 
     <!-- Bootstrap Core JavaScript -->
     <script src="js/bootstrap.min.js"></script>
@@ -534,7 +539,25 @@
 
     <!-- Custom Theme JavaScript -->
     <script src="js/freelancer.js"></script>
+    <script src="signalr/hubs"></script>
+    
+    <script>
+        $(function () {
+            $.connection.hub.url = "http://localhost:3000/signalr";
 
+            var chat = $.connection.chatHub;
+
+            chat.client.addMessage = function (name, message) {
+                console.log(name, message);
+            };
+
+            $.connection.hub.start().done(function () {
+                $("#chat-button").click(function () {
+                    chat.server.send("test", "123");
+                });
+            });
+        });
+    </script>
 </body>
 
 </html>

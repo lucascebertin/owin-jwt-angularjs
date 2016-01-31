@@ -1,4 +1,5 @@
-﻿using Microsoft.Owin;
+﻿using Microsoft.AspNet.SignalR;
+using Microsoft.Owin;
 using Microsoft.Owin.Cors;
 using Microsoft.Owin.Diagnostics;
 using Microsoft.Owin.StaticFiles;
@@ -39,7 +40,11 @@ namespace Playground.Owin.Jwt
                 .UseJwtBearerAuthentication(new JwtOptions())
                 .UseAngularServer("/", "/index.html")
                 .UseFileServer(options)
-                .UseWebApi(config);
+                .UseWebApi(config)
+                .MapSignalR(new HubConfiguration {
+                    EnableJSONP = true,
+                    EnableJavaScriptProxies = true
+                });
         }
     }
 }
