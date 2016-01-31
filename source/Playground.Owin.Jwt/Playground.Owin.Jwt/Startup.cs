@@ -16,14 +16,20 @@ namespace Playground.Owin.Jwt
     {
         public void Configuration(IAppBuilder app)
         {
-            var config = new HttpConfiguration();
-            config.MapHttpAttributeRoutes();
-            config.Routes.MapHttpRoute(
+            var webApiConfig = new HttpConfiguration();
+            var hubConfig = new HubConfiguration
+            {
+                EnableJSONP = true,
+                EnableJavaScriptProxies = true
+            };
+
+            webApiConfig.MapHttpAttributeRoutes();
+            webApiConfig.Routes.MapHttpRoute(
                 name: "DefaultApi",
                 routeTemplate: "api/{controller}/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
-            config.EnableCors(
+            webApiConfig.EnableCors(
                 new EnableCorsAttribute("*", "*", "GET, POST, OPTIONS, PUT, DELETE, PATCH")
             );
 
@@ -33,18 +39,14 @@ namespace Playground.Owin.Jwt
                 FileSystem = new WebPhysicalFileSystem(".\\wwwroot")
             };
 
-
             app.UseErrorPage(ErrorPageOptions.ShowAll)
                 .UseCors(CorsOptions.AllowAll)
                 .UseOAuthAuthorizationServer(new OAuthOptions())
                 .UseJwtBearerAuthentication(new JwtOptions())
                 .UseAngularServer("/", "/index.html")
                 .UseFileServer(options)
-                .UseWebApi(config)
-                .MapSignalR(new HubConfiguration {
-                    EnableJSONP = true,
-                    EnableJavaScriptProxies = true
-                });
+                .UseWebApi(webApiConfig)
+                .MapSignalR(hubConfig);
         }
     }
 }

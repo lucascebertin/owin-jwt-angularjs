@@ -1,15 +1,23 @@
 ﻿using Microsoft.AspNet.SignalR;
 using Playground.Owin.Jwt.Hubs;
+using Playground.Owin.Jwt.Models.Abstractions;
 using System.Web.Http;
 
 namespace Playground.Owin.Jwt.Controllers
 {
     public class HelloWorldController : ApiController
     {
+        private readonly ITest _Test;
+
         public HelloWorldController()
         {
 
         }
+
+        //public HelloWorldController(ITest test)
+        //{
+        //    _Test = test;
+        //}
 
         public IHttpActionResult Get(int? id = null)
         {

@@ -134,6 +134,8 @@
     <Compile Include="Infrastructure\StaticFiles\AngularServerMiddleware.cs" />
     <Compile Include="Infrastructure\StaticFiles\AngularServerOptions.cs" />
     <Compile Include="Infrastructure\StaticFiles\WebPhysicalFileSystem.cs" />
+    <Compile Include="Models\Abstractions\ITest.cs" />
+    <Compile Include="Models\Implementations\Test.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
