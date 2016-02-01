@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNet.SignalR;
+using Microsoft.AspNet.SignalR.Hubs;
 using Playground.Owin.Jwt.Models.Abstractions;
 
 namespace Playground.Owin.Jwt.Hubs
 {
-    public class ChatHub : Hub
+    public class ChatHub : Hub, IHub
     {
         private readonly ITest _Test;
 
