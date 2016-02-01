@@ -155,6 +155,7 @@
     <Compile Include="DryIoc\SignalR\DryIocSignalR.cs" />
     <Compile Include="DryIoc\WebApi\DryIocWebApi.cs" />
     <Compile Include="Hubs\ChatHub.cs" />
+    <Compile Include="Hubs\SecuredHub.cs" />
     <Compile Include="Infrastructure\JWT\JwtFormat.cs" />
     <Compile Include="Infrastructure\JWT\JwtOptions.cs" />
     <Compile Include="Infrastructure\OAuth\OAuthOptions.cs" />

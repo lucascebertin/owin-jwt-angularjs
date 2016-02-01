@@ -14,6 +14,7 @@ using Playground.Owin.Jwt.Models.Abstractions;
 using Playground.Owin.Jwt.Models.Implementations;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Cors;
 
@@ -58,11 +59,11 @@ namespace Playground.Owin.Jwt
                 () => new DryIocHubActivator(container)
             );
 
-            var implementingClasses = Assembly.GetExecutingAssembly() 
+            var implementingClasses = Assembly.GetExecutingAssembly()
                 .GetTypes()
                 .Where(type =>
                     type.BaseType == typeof(Hub)
-                ); 
+                );
 
             foreach (var implementingClass in implementingClasses)
                 container.Register(implementingClass);
@@ -74,7 +75,31 @@ namespace Playground.Owin.Jwt
                 .UseAngularServer("/", "/index.html")
                 .UseFileServer(options)
                 .UseWebApi(webApiConfig)
+                .Use(typeof(OwinMiddleWareQueryStringExtractor))
                 .MapSignalR(hubConfig);
+        }
+    }
+
+    public class OwinMiddleWareQueryStringExtractor : OwinMiddleware
+    {
+        public OwinMiddleWareQueryStringExtractor(OwinMiddleware next)
+            : base(next)
+        {
+        }
+
+        public override async Task Invoke(IOwinContext context)
+        {
+            if (context.Request.Path.Value.StartsWith("/signalr"))
+            {
+                string bearerToken = context.Request.Query.Get("bearer_token");
+                if (bearerToken != null)
+                {
+                    string[] authorization = { "Bearer " + bearerToken };
+                    context.Request.Headers.Add("Authorization", authorization);
+                }
+            }
+
+            await Next.Invoke(context);
         }
     }
 }
