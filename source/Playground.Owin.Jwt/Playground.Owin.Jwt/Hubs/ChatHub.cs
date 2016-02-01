@@ -15,7 +15,7 @@ namespace Playground.Owin.Jwt.Hubs
 
         public void Send(string name, string message)
         {
-            Clients.All.addMessage(name, message);
+            Clients.All.broadcastMessage(name, message);
         }
     }
 }

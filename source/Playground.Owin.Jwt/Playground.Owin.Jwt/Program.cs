@@ -8,7 +8,7 @@ namespace Playground.Owin.Jwt
     {
         static void Main(string[] args)
         {
-            var endpoint = "http://localhost:3000";
+            var endpoint = "http://127.0.0.1:3000";
             using (WebApp.Start<Startup>(endpoint))
             {
                 Console.WriteLine($"Server listening on: {endpoint}");
