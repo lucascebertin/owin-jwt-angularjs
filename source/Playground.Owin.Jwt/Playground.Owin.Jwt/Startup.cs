@@ -1,27 +1,40 @@
 ﻿using DryIoc;
 using DryIoc.SignalR;
 using DryIoc.WebApi;
+
+using Owin;
+
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
 using Microsoft.Owin;
 using Microsoft.Owin.Cors;
 using Microsoft.Owin.Diagnostics;
 using Microsoft.Owin.StaticFiles;
-using Owin;
-using Playground.Owin.Jwt.Hubs;
+
 using Playground.Owin.Jwt.Infrastructure;
+using Playground.Owin.Jwt.Infrastructure.QueryStrings;
 using Playground.Owin.Jwt.Models.Abstractions;
 using Playground.Owin.Jwt.Models.Implementations;
+
+using System;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Cors;
+using AppFunc = System.Func<
+    System.Collections.Generic.IDictionary<string, object>,
+    System.Threading.Tasks.Task
+>;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 [assembly: OwinStartup(typeof(Playground.Owin.Jwt.Startup))]
 
 namespace Playground.Owin.Jwt
 {
+    
+
+
     public class Startup
     {
         public void Configuration(IAppBuilder app)
@@ -49,7 +62,7 @@ namespace Playground.Owin.Jwt
                 FileSystem = new WebPhysicalFileSystem(".\\wwwroot")
             };
 
-            var container = new Container(rules => rules.WithoutThrowOnRegisteringDisposableTransient())
+            var container = new Container()
                 .WithWebApi(webApiConfig);
 
             container.Register<ITest, Test>();
@@ -66,9 +79,10 @@ namespace Playground.Owin.Jwt
                 );
 
             foreach (var implementingClass in implementingClasses)
-                container.Register(implementingClass);
+                container.Register(implementingClass, setup: Setup.With(allowDisposableTransient: true));
 
-            app.UseErrorPage(ErrorPageOptions.ShowAll)
+            app.Use(new Func<AppFunc, AppFunc>(next => env => Invoke(next, env)))
+                .UseErrorPage(ErrorPageOptions.ShowAll)
                 .UseCors(CorsOptions.AllowAll)
                 .UseOAuthAuthorizationServer(new OAuthOptions())
                 .UseJwtBearerAuthentication(new JwtOptions())
@@ -78,28 +92,16 @@ namespace Playground.Owin.Jwt
                 .Use(typeof(OwinMiddleWareQueryStringExtractor))
                 .MapSignalR(hubConfig);
         }
-    }
 
-    public class OwinMiddleWareQueryStringExtractor : OwinMiddleware
-    {
-        public OwinMiddleWareQueryStringExtractor(OwinMiddleware next)
-            : base(next)
+        private async Task Invoke(AppFunc next, IDictionary<string, object> env)
         {
-        }
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            await Console.Out.WriteLineAsync($"[BEGIN] :: #{env["owin.RequestPath"]}");
+            
+            await next.Invoke(env);
 
-        public override async Task Invoke(IOwinContext context)
-        {
-            if (context.Request.Path.Value.StartsWith("/signalr"))
-            {
-                string bearerToken = context.Request.Query.Get("bearer_token");
-                if (bearerToken != null)
-                {
-                    string[] authorization = { "Bearer " + bearerToken };
-                    context.Request.Headers.Add("Authorization", authorization);
-                }
-            }
-
-            await Next.Invoke(context);
+            Console.ForegroundColor = ConsoleColor.Green;
+            await Console.Out.WriteLineAsync($"[-END-] :: #{env["owin.RequestPath"]}");
         }
-    }
+    }   
 }

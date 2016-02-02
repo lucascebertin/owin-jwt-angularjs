@@ -160,6 +160,7 @@
     <Compile Include="Infrastructure\JWT\JwtOptions.cs" />
     <Compile Include="Infrastructure\OAuth\OAuthOptions.cs" />
     <Compile Include="Infrastructure\OAuth\OAuthProvider.cs" />
+    <Compile Include="Infrastructure\QueryStrings\OwinMiddleWareQueryStringExtractor.cs" />
     <Compile Include="Infrastructure\StaticFiles\AngularServerExtension.cs" />
     <Compile Include="Infrastructure\StaticFiles\AngularServerMiddleware.cs" />
     <Compile Include="Infrastructure\StaticFiles\AngularServerOptions.cs" />
