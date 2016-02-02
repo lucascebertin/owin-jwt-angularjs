@@ -84,12 +84,12 @@ namespace Playground.Owin.Jwt
             app.Use(new Func<AppFunc, AppFunc>(next => env => Invoke(next, env)))
                 .UseErrorPage(ErrorPageOptions.ShowAll)
                 .UseCors(CorsOptions.AllowAll)
+                .Use(typeof(OwinMiddleWareQueryStringExtractor))
                 .UseOAuthAuthorizationServer(new OAuthOptions())
                 .UseJwtBearerAuthentication(new JwtOptions())
                 .UseAngularServer("/", "/index.html")
                 .UseFileServer(options)
                 .UseWebApi(webApiConfig)
-                .Use(typeof(OwinMiddleWareQueryStringExtractor))
                 .MapSignalR(hubConfig);
         }
 

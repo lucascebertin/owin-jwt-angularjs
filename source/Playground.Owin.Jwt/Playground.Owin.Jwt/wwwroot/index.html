@@ -27,29 +27,48 @@
     <!--Add script to update the page and send messages.-->
     <script type="text/javascript">
         $(function () {
-            // Declare a proxy to reference the hub.
-            var chat = $.connection.chatHub;
-            // Create a function that the hub can call to broadcast messages.
-            chat.client.broadcastMessage = function (name, message) {
-                // Html encode display name and message.
-                var encodedName = $('<div />').text(name).html();
-                var encodedMsg = $('<div />').text(message).html();
-                // Add the message to the page.
-                $('#discussion').append('<li><strong>' + encodedName
-                    + '</strong>:&nbsp;&nbsp;' + encodedMsg + '</li>');
-            };
-            // Get the user name and store it to prepend to messages.
-            $('#displayname').val(prompt('Enter your name:', ''));
-            // Set initial focus to message input box.
-            $('#message').focus();
-            // Start the connection.
-            $.connection.hub.start().done(function () {
-                $('#sendmessage').click(function () {
-                    // Call the Send method on the hub.
-                    chat.server.send($('#displayname').val(), $('#message').val());
-                    // Clear text box and reset focus for next comment.
-                    $('#message').val('').focus();
-                });
+            $('#sendmessage').attr("disabled", "disabled");
+            $.ajax({
+                url: "/token",
+                contentType: "JSON",
+                method: "POST",
+                data: {
+                    username: "user",
+                    password: "pass",
+                    grant_type: "password"
+                },
+                success: function (data) {
+                    
+                    $.connection.hub.url = "/signalr";
+                    $.connection.hub.qs = { bearer_token: data.access_token };
+
+                    var chat = $.connection.chatHub;
+                    var secure = $.connection.securedHub;
+
+                    chat.client.broadcastMessage = function (name, message) {
+                        var encodedName = $('<div />').text(name).html();
+                        var encodedMsg = $('<div />').text(message).html();
+
+                        $('#discussion').append('<li><strong>' + encodedName
+                            + '</strong>:&nbsp;&nbsp;' + encodedMsg + '</li>');
+                    };
+
+                    secure.client.replySecret = function (data) {
+                        console.log(data);
+                    };
+
+                    $('#displayname').val(prompt('Enter your name:', ''));
+                    $('#message').focus();
+                    $.connection.hub.start().done(function () {
+                        $('#sendmessage').removeAttr("disabled");
+                        $('#sendmessage').click(function () {
+                            chat.server.send($('#displayname').val(), $('#message').val());
+                            secure.server.secret('123!!#');
+                            $('#message').val('').focus();
+                        });
+                    });
+
+                }
             });
         });
     </script>
