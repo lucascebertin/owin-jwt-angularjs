@@ -6,11 +6,11 @@ namespace Playground.Owin.Jwt.Hubs
 {
     public class ChatHub : Hub, IHub
     {
-        private readonly ITest _Test;
+        private readonly ITest _test;
 
         public ChatHub(ITest test)
         {
-            _Test = test;
+            _test = test;
         }
 
         public void Send(string name, string message)
