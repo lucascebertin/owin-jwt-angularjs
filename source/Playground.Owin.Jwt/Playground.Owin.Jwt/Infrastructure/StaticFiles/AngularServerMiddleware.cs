@@ -25,7 +25,8 @@ namespace Playground.Owin.Jwt.Infrastructure
         {
             await _innerMiddleware.Invoke(arg);
 
-            if ((int)arg["owin.ResponseStatusCode"] == 404 && _options.Html5Mode)
+            var responseStatusCode = (int)arg["owin.ResponseStatusCode"];
+            if (responseStatusCode == 404 && _options.Html5Mode)
             {
                 arg["owin.RequestPath"] = _options.EntryPath.Value;
                 await _innerMiddleware.Invoke(arg);

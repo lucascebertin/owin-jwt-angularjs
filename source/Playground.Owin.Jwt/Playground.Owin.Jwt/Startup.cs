@@ -32,9 +32,6 @@ using System.Threading.Tasks;
 
 namespace Playground.Owin.Jwt
 {
-    
-
-
     public class Startup
     {
         public void Configuration(IAppBuilder app)
@@ -63,23 +60,10 @@ namespace Playground.Owin.Jwt
             };
 
             var container = new Container()
-                .WithWebApi(webApiConfig);
+                .WithWebApi(webApiConfig)
+                .WithSignalR(Assembly.GetExecutingAssembly());
 
             container.Register<ITest, Test>();
-
-            GlobalHost.DependencyResolver.Register(
-                typeof(IHubActivator),
-                () => new DryIocHubActivator(container)
-            );
-
-            var implementingClasses = Assembly.GetExecutingAssembly()
-                .GetTypes()
-                .Where(type =>
-                    type.BaseType == typeof(Hub)
-                );
-
-            foreach (var implementingClass in implementingClasses)
-                container.Register(implementingClass, setup: Setup.With(allowDisposableTransient: true));
 
             app.Use(new Func<AppFunc, AppFunc>(next => env => Invoke(next, env)))
                 .UseErrorPage(ErrorPageOptions.ShowAll)
@@ -91,6 +75,15 @@ namespace Playground.Owin.Jwt
                 .UseFileServer(options)
                 .UseWebApi(webApiConfig)
                 .MapSignalR(hubConfig);
+        }
+
+        private static void RegisterHubActivatorAndHubs(IContainer container)
+        {
+            GlobalHost.DependencyResolver.Register(
+                typeof (IHubActivator),
+                () => new DryIocHubActivator(container));
+
+            container.RegisterHubs(Assembly.GetExecutingAssembly());
         }
 
         private async Task Invoke(AppFunc next, IDictionary<string, object> env)
